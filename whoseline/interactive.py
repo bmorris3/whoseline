@@ -1,12 +1,18 @@
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
 import matplotlib.pyplot as plt
 import numpy as np
-
+import astropy.units as u
 from ipywidgets import widgets 
-#from IPython.html.widgets import interact
 
 __all__ = ['interactive_plot']
 
+@u.quantity_input(wavelength=u.Angstrom)
 def interactive_plot(wavelength, flux):
+    
+    wavelength = wavelength.to(u.Angstrom).value
+    
     from .lines import table, plot_lines
     wavelength_width = widgets.IntSlider(min=0.1, max=wavelength.ptp(), 
                                          step=0.1, value=wavelength.ptp(),
