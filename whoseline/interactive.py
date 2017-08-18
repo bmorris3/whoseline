@@ -5,15 +5,24 @@ import matplotlib.pyplot as plt
 import numpy as np
 import astropy.units as u
 from ipywidgets import widgets 
+import warnings
 
 __all__ = ['interactive_plot']
 
 @u.quantity_input(wavelength=u.Angstrom)
 def interactive_plot(wavelength, flux):
     
+    from .lines import (table, plot_lines, table_min_wavelength, table_max_wavelength, 
+                        LineListWavelengthBoundWarning)
+    
     wavelength = wavelength.to(u.Angstrom).value
     
-    from .lines import table, plot_lines
+    if (wavelength.min() < table_min_wavelength) or (wavelength.max() > table_max_wavelength):
+        warnmessage = """Spectrum's wavelength bounds extend 
+                         beyond wavelength bounds of line list"""
+        
+        warnings.warn(warnmessage, LineListWavelengthBoundWarning)
+    
     wavelength_width = widgets.IntSlider(min=0.1, max=wavelength.ptp(), 
                                          step=0.1, value=wavelength.ptp(),
                                          description="Wavelength Width:")

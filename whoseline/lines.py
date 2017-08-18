@@ -4,13 +4,26 @@ import os
 from astropy.io import ascii
 import matplotlib.pyplot as plt
 import numpy as np
+from astropy.utils.exceptions import AstropyUserWarning
 
-__all__ = ['table', 'plot_lines']
+__all__ = ['table', 'plot_lines', 'LineListWavelengthBoundWarning']
 
 vald3_path = os.path.join(os.path.dirname(__file__), os.path.pardir, 
                           'data', 'vald3_threshold05.txt')
 
 table = ascii.read(vald3_path)
+
+table_min_wavelength = table['wavelengths'].min()
+table_max_wavelength = table['wavelengths'].max()
+
+
+class LineListWavelengthBoundWarning(AstropyUserWarning):
+    """
+    Raise when a spectrum's wavelength bounds extend 
+    beyond bounds of line list table
+    """
+    pass
+
 
 def plot_lines(line_table, axis, n_lines, line_kwargs, upper_xaxis=True):
     wl_bounds = axis.get_xlim()
@@ -23,7 +36,10 @@ def plot_lines(line_table, axis, n_lines, line_kwargs, upper_xaxis=True):
     if len(strengths_within_bounds) < n_lines:
         n_lines = len(strengths_within_bounds)
     
-    condition = strengths_within_bounds >= np.sort(strengths_within_bounds)[-n_lines]
+    if len(strengths_within_bounds) > 1:
+        condition = strengths_within_bounds >= np.sort(strengths_within_bounds)[-n_lines]
+    else: 
+        condition = np.ones_like(strengths_within_bounds).astype(bool)
 
     for wavelength, strength, species in zip(line_table['wavelengths'][rows_within_bounds][condition],
                                              line_table['strengths'][rows_within_bounds][condition], 
