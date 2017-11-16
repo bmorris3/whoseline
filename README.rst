@@ -19,10 +19,13 @@ For more information, see:
 Status reports for developers
 -----------------------------
 
-.. image:: https://travis-ci.org/astropy/package-template.svg
-    :target: https://travis-ci.org/astropy/package-template
-    :alt: Travis Status
+.. image:: https://travis-ci.org/bmorris3/whoseline.svg?branch=master
+    :target: https://travis-ci.org/bmorris3/whoseline
 
+.. image:: https://readthedocs.org/projects/whose-line/badge/?version=latest
+    :target: http://whose-line.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+    
 License
 -------
 
