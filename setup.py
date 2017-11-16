@@ -95,8 +95,8 @@ package_info = get_package_info()
 
 # Add the project-global data
 package_info['package_data'].setdefault(PACKAGENAME, [])
-package_info['package_data'][PACKAGENAME].append('whoseline/data/*')
-
+package_info['package_data'][PACKAGENAME].append('data/linelists/*')
+print('data', package_info['package_data'][PACKAGENAME])
 # Define entry points for command-line scripts
 entry_points = {'console_scripts': []}
 
