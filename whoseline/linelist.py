@@ -1,7 +1,11 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
-__all__ = ['LineList']
+__all__ = ['LineList', 'query']
+
+import sqlite3
+conn = sqlite3.connect('test.db')
+c = conn.cursor()
 
 
 class LineList(object):
@@ -19,3 +23,14 @@ class LineList(object):
         self.wavelength = wavelength
         self.species = species
         self.priority = priority
+
+
+def query(table, wavelength_min, wavelength_max):
+    """
+    Parameters
+    ----------
+    table : `str`
+    wavelength_min : `~astropy.units.Quantity`
+    wavelength_max : `~astropy.units.Quantity`
+    """
+    
