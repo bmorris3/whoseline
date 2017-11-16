@@ -7,6 +7,10 @@ Whose line is it anyway?
 
 A Python package for quickly accessing spectral line lists for astronomy.
 
+Visualization tools for these lines are in
+the `whoseline-vis <https://github.com/bmorris3/whoseline-vis>`_ repo.
+
+
 Status reports for developers
 -----------------------------
 
