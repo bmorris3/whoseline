@@ -5,11 +5,13 @@ __all__ = ['LineList', 'query', 'linelist_paths']
 
 import os
 import astropy.units as u
+import numpy as np
 
 mock_data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'data', 'vald3_threshold05.txt')
 
-mock_data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+mock_data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data',
+                             'linelists')
 
 linelist_paths = {'hitran': 'hitran_simplified.csv',
                   'iraf_sky_lines': 'iraf_sky_lines.csv',
@@ -67,9 +69,13 @@ class LineList(object):
 
         table = ascii.read(os.path.join(mock_data_dir, linelist_paths[source]))
 
-        wavelength_column = ['wave' in cn.lower() for cn in table.colnames][0]
-        species_column = ['species' in cn.lower() for cn in table.colnames][0]
-        priorities_column = ['priorit' in cn.lower() for cn in table.colnames][0]
+        print(table.colnames, type(table.colnames))
+        colnames = np.array(table.colnames)
+        wavelength_column = colnames[np.array(['wave' in cn.lower() for cn in table.colnames])][0]
+        species_column = colnames[np.array(['species' in cn.lower() for cn in table.colnames])][0]
+        priorities_column = colnames[np.array(['priorit' in cn.lower() for cn in table.colnames])][0]
+
+        print(wavelength_column, species_column, priorities_column)
 
         in_wavelength_bounds = ((table[wavelength_column]*u.Angstrom < wavelength_max) &
                                 (table[wavelength_column]*u.Angstrom > wavelength_min))
@@ -100,8 +106,8 @@ def query(source, wavelength_min, wavelength_max):
     >>> query('example', 3000*u.Angstrom, 4000*u.Angstrom) # doctest: +SKIP
     <whoseline.linelist_mock.LineList at 0x106030828>
     """
-    if not source == 'example':
-        raise NotImplementedError()
+    #if not source == 'example':
+    #    raise NotImplementedError()
 
     ll = LineList.from_csv(source, wavelength_min=wavelength_min,
                             wavelength_max=wavelength_max)
