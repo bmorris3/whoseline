@@ -59,8 +59,6 @@ env:
     matrix:
         # Make sure that egg_info works without dependencies
         - PYTHON_VERSION=2.7 SETUP_CMD='egg_info'
-        - PYTHON_VERSION=3.4 SETUP_CMD='egg_info'
-        - PYTHON_VERSION=3.5 SETUP_CMD='egg_info'
         - PYTHON_VERSION=3.6 SETUP_CMD='egg_info'
 
 matrix:
@@ -70,12 +68,12 @@ matrix:
 
     include:
         # Try MacOS X
-        - os: osx
-          env: SETUP_CMD='test'
+        #- os: osx
+        #  env: SETUP_CMD='test'
 
         # Do a coverage test.
-        - os: linux
-          env: SETUP_CMD='test --coverage'
+        #- os: linux
+        #  env: SETUP_CMD='test --coverage'
 
         # Check for sphinx doc build warnings - we do this first because it
         # may run for a long time
@@ -83,9 +81,9 @@ matrix:
           env: SETUP_CMD='build_docs -w'
 
         # Now try Astropy dev with the latest Python and LTS with Python 2.7 and 3.x.
-        - os: linux
-          env: ASTROPY_VERSION=development
-               EVENT_TYPE='pull_request push cron'
+        #- os: linux
+        #  env: ASTROPY_VERSION=development
+        #       EVENT_TYPE='pull_request push cron'
         - os: linux
           env: PYTHON_VERSION=2.7 ASTROPY_VERSION=lts
         - os: linux
@@ -99,10 +97,6 @@ matrix:
         - os: linux
           env: PYTHON_VERSION=2.7 NUMPY_VERSION=1.9
         - os: linux
-          env: PYTHON_VERSION=3.4 NUMPY_VERSION=1.10
-        - os: linux
-          env: PYTHON_VERSION=3.5 NUMPY_VERSION=1.11
-        - os: linux
           env: NUMPY_VERSION=1.12
 
         # Try numpy pre-release
@@ -111,8 +105,8 @@ matrix:
                EVENT_TYPE='pull_request push cron'
 
         # Do a PEP8 test with pycodestyle
-        - os: linux
-          env: MAIN_CMD='pycodestyle packagename --count' SETUP_CMD=''
+        #- os: linux
+        #  env: MAIN_CMD='pycodestyle packagename --count' SETUP_CMD=''
 
     allow_failures:
         # Do a PEP8 test with pycodestyle
