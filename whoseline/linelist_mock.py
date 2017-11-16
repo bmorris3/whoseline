@@ -67,18 +67,14 @@ class LineList(object):
         >>> import astropy.units as u
         >>> l = LineList.from_csv(3000*u.Angstrom, 4000*u.Angstrom)
         """
-        #from astropy.io import ascii
-
-        #table = ascii.read(os.path.join(mock_data_dir, linelist_paths[source]))
-
+        # TODO: don't read with pandas and convert to astropy table.
+        # just use pandas?
         path = os.path.join(mock_data_dir, linelist_paths[source])
         table = Table.from_pandas(pd.read_csv(path))
-        colnames = np.array(table.colnames)
-        wavelength_column = colnames[np.array(['wave' in cn.lower() for cn in table.colnames])][0]
-        species_column = colnames[np.array(['species' in cn.lower() for cn in table.colnames])][0]
-        priorities_column = colnames[np.array(['priorit' in cn.lower() for cn in table.colnames])][0]
-
-        print(wavelength_column, species_column, priorities_column)
+        # TODO: More sophisticated table column name finder
+        wavelength_column = _col_name_containing('wave', table)
+        species_column = _col_name_containing('species', table)
+        priorities_column = _col_name_containing('priorit', table)
 
         in_wavelength_bounds = ((table[wavelength_column]*u.Angstrom < wavelength_max) &
                                 (table[wavelength_column]*u.Angstrom > wavelength_min))
@@ -86,6 +82,15 @@ class LineList(object):
         return cls(wavelength=table[wavelength_column][in_wavelength_bounds].data * u.Angstrom,
                    species=table[species_column][in_wavelength_bounds].data,
                    priority=table[priorities_column][in_wavelength_bounds].data)
+
+
+def _col_name_containing(search_str, table):
+    """
+    Find column header containing ``search_str``, return the exact string of that
+    column header.
+    """
+    colnames = np.array(table.colnames)
+    return colnames[np.array([search_str in cn.lower() for cn in colnames])][0]
 
 
 @u.quantity_input(wavelength_min=u.Angstrom, wavelength_max=u.Angstrom)
