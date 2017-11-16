@@ -57,9 +57,21 @@ def query(source, wavelength_min, wavelength_max):
     source : str
     wavelength_min : `~astropy.units.Quantity`
     wavelength_max : `~astropy.units.Quantity`
+
+    Returns
+    -------
+    linelist : `~whoseline.LineList` object
+
+    Example
+    -------
+    >>> from whoseline import query
+    >>> query('example', 3000*u.Angstrom, 4000*u.Angstrom) # doctest: +SKIP
+    <whoseline.linelist_mock.LineList at 0x106030828>
     """
-    if source == 'NIST':
-        ll = LineList.from_mock(wavelength_min=wavelength_min,
-                                wavelength_max=wavelength_max)
-        
+    if not source == 'example':
+        raise NotImplementedError()
+
+    ll = LineList.from_mock(wavelength_min=wavelength_min,
+                            wavelength_max=wavelength_max)
+    
     return ll
