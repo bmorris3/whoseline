@@ -7,7 +7,6 @@ import os
 import astropy.units as u
 import numpy as np
 import pandas as pd
-from astropy.table import Table
 
 mock_data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'data', 'vald3_threshold05.txt')
@@ -70,18 +69,18 @@ class LineList(object):
         # TODO: don't read with pandas and convert to astropy table.
         # just use pandas?
         path = os.path.join(mock_data_dir, linelist_paths[source])
-        table = Table.from_pandas(pd.read_csv(path))
+        table = pd.read_csv(path)
         # TODO: More sophisticated table column name finder
         wavelength_column = _col_name_containing('wave', table)
         species_column = _col_name_containing('species', table)
         priorities_column = _col_name_containing('priorit', table)
 
-        in_wavelength_bounds = ((table[wavelength_column]*u.Angstrom < wavelength_max) &
-                                (table[wavelength_column]*u.Angstrom > wavelength_min))
+        in_wavelength_bounds = ((table[wavelength_column].values*u.Angstrom < wavelength_max) &
+                                (table[wavelength_column].values*u.Angstrom > wavelength_min))
 
-        return cls(wavelength=table[wavelength_column][in_wavelength_bounds].data * u.Angstrom,
-                   species=table[species_column][in_wavelength_bounds].data,
-                   priority=table[priorities_column][in_wavelength_bounds].data)
+        return cls(wavelength=table[wavelength_column].values[in_wavelength_bounds] * u.Angstrom,
+                   species=table[species_column].values[in_wavelength_bounds],
+                   priority=table[priorities_column].values[in_wavelength_bounds])
 
 
 def _col_name_containing(search_str, table):
@@ -89,7 +88,7 @@ def _col_name_containing(search_str, table):
     Find column header containing ``search_str``, return the exact string of that
     column header.
     """
-    colnames = np.array(table.colnames)
+    colnames = table.columns.values
     return colnames[np.array([search_str in cn.lower() for cn in colnames])][0]
 
 
