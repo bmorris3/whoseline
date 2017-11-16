@@ -6,6 +6,8 @@ __all__ = ['LineList', 'query', 'linelist_paths']
 import os
 import astropy.units as u
 import numpy as np
+import pandas as pd
+from astropy.table import Table
 
 mock_data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'data', 'vald3_threshold05.txt')
@@ -65,11 +67,12 @@ class LineList(object):
         >>> import astropy.units as u
         >>> l = LineList.from_csv(3000*u.Angstrom, 4000*u.Angstrom)
         """
-        from astropy.io import ascii
+        #from astropy.io import ascii
 
-        table = ascii.read(os.path.join(mock_data_dir, linelist_paths[source]))
+        #table = ascii.read(os.path.join(mock_data_dir, linelist_paths[source]))
 
-        print(table.colnames, type(table.colnames))
+        path = os.path.join(mock_data_dir, linelist_paths[source])
+        table = Table.from_pandas(pd.read_csv(path))
         colnames = np.array(table.colnames)
         wavelength_column = colnames[np.array(['wave' in cn.lower() for cn in table.colnames])][0]
         species_column = colnames[np.array(['species' in cn.lower() for cn in table.colnames])][0]
