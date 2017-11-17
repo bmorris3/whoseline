@@ -67,7 +67,7 @@ with connection:
 	
 	query = "INSERT INTO line (species, wavelength, priority, source_id) VALUES (?,?,?,?)"
 	
-	if (args.list.endswith(".gz"):
+	if (args.list.endswith(".gz")):
 		f = gzip.open(args.file)
 	else:
 		f = open(args.list)
