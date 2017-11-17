@@ -84,9 +84,11 @@ generate_version_py(PACKAGENAME, VERSION, RELEASE,
                     get_debug_option(PACKAGENAME))
 
 # Treat everything in scripts except README* as a script to be installed
+#scripts = [fname for fname in glob.glob(os.path.join('scripts', '*'))
+#           if not os.path.basename(fname).startswith('README')
 scripts = [fname for fname in glob.glob(os.path.join('scripts', '*'))
-           if not os.path.basename(fname).startswith('README')]
-
+                   if not os.path.basename(fname).startswith('README')
+                              and not '.sqlite3' in os.path.basename(fname)]
 
 # Get configuration information from all of the various subpackages.
 # See the docstring for setup_helpers.update_package_files for more
