@@ -1,0 +1,21 @@
+
+# This file contains commands to create entries for known sources and populate various line lists.
+# This file can be sourced to load them all, e.g.
+#
+#    % source line_sources.txt
+#
+# or copied and pasted as needed.
+
+./source2db.py --database whoseline.sqlite3 --short-name nist --display-name "NIST Atomic Spectra Database v5.0" --url "https://physics.nist.gov/PhysRefData/ASD/lines_form.html"
+./source2db.py -d whoseline.sqlite3 --short-name chianti --display-name 'CHIANTI Atomic Database v8.0' --url http://www.chiantidatabase.org
+./source2db.py -d whoseline.sqlite3 --short-name arcturus --display-name 'Arcturus'
+./source2db.py -d whoseline.sqlite3 --short-name hitran --display-name HITRAN2012 --url http://www.sciencedirect.com/science/article/pii/S0022407313002859
+./source2db.py -d whoseline.sqlite3 --short-name irafsky --display-name IRAF Sky Lines
+./source2db.py -d whoseline.sqlite3 --short-name vald3 --display-name vald3
+./source2db.py -d whoseline.sqlite3 --short-name vald3_threshold --display-name vald3 threshold 05
+
+./lines2db.py  -d whoseline.sqlite3 -s arcturus -l ../whoseline/data/linelists/arcturus_optical.csv --header-lines 1 --species-col 1 --wavelength-col 2 --priority-col 3
+./lines2db.py  -d whoseline.sqlite3 -s chianti -l ../whoseline/data/linelists/arcturus_optical.csv --header-lines 1 --species-col 2 --wavelength-col 1 --priority-col 3
+./lines2db.py  -d whoseline.sqlite3 -s irafsky -l ../whoseline/data/linelists/iraf_sky_lines.csv --header-lines 1 --species-col 2 --wavelength-col 1 --priority-col 3
+./lines2db.py  -d whoseline.sqlite3 -s vald3 -l ../whoseline/data/linelists/vald3.csv --header-lines 1 --species-col 2 --wavelength-col 1 --priority-col 3
+./lines2db.py  -d whoseline.sqlite3 -s vald3_threshold -l ../whoseline/data/linelists/vald3_threshold05.txt --header-lines 1 --species-col 3 --wavelength-col 2 --priority-col 1
