@@ -41,16 +41,20 @@ minimum_wavelength = solara.reactive(0.38)
 maximum_wavelength = solara.reactive(0.41)
 spectrum_line_alpha = solara.reactive(1)
 spectrum_line_width = solara.reactive(0.7)
-progress_value = solara.reactive(0)
-loading_species = solara.reactive([])
-loaded_species = solara.reactive([])
+meta = solara.reactive({})
+
 T_eff = solara.reactive(5800)
 log_g = solara.reactive(4.5)
 log_scale = solara.reactive(True)
 
+style = {
+    'text-transform': 'capitalize'
+}
+
 
 @solara.component
 def Page():
+    solara.Title("whose line is it anyway?")
 
     def clear_species_selections():
         species_list.set([])
@@ -58,12 +62,15 @@ def Page():
     def select_all_species():
         species_list.set(asplund_list)
 
-    def select_n_species():
+    def next_n_species():
         if len(species_list.value):
             last_idx = asplund_list.index(species_list.value[-1])
         else:
             last_idx = 0
         species_list.set(asplund_list[last_idx:last_idx + int(n_species.value)])
+
+    def first_n_species():
+        species_list.set(asplund_list[:int(n_species.value)])
 
     with solara.Column():
         with solara.Columns([0.5, 1, 1, 1, 0.5]):
@@ -72,20 +79,22 @@ def Page():
 
             with solara.Column():
                 solara.Markdown('## PHOENIX Spectrum')
-                solara.Select("Effective temperature [K]", list(phoenix_model_temps),  T_eff)
+                solara.Select("Effective temperature [K]", list(phoenix_model_temps), T_eff)
                 solara.Select("log g [cgs]", list(phoenix_model_logg), log_g)
+                if len(meta.value):
+                    children = [
+                        solara.HTML(tag='p', unsafe_innerHTML=str(meta.value.tostring(sep=r'<br />')))
+                    ]
+                    solara.Details("PHOENIX model header", children=children, expand=False)
 
             with solara.Column():
-                solara.Markdown('## Elements')
+                solara.Markdown('## Elements\nSorted in order of solar abundance.')
                 solara.SelectMultiple("Elements", species_list, asplund_list)
-                solara.Button("Clear selected elements", on_click=clear_species_selections)
-                solara.Button("Select all elements (slow)", on_click=select_all_species)
+                solara.Button("Clear selected elements", on_click=clear_species_selections, style=style)
+                solara.Button("Select all elements (slow)", on_click=select_all_species, style=style)
                 solara.InputInt("Number of species per query", n_species)
-                solara.Button(f"Select first N elements", on_click=select_n_species)
-                solara.Button(f"Select next N elements", on_click=select_n_species)
-
-                # solara.Markdown(f"Loading species: {', '.join(loaded_species.value)}")
-                # solara.ProgressLinear(value=progress_value.value, color="purple")
+                solara.Button(f"Select first {n_species} elements", on_click=first_n_species, style=style)
+                solara.Button(f"Select next {n_species} elements", on_click=next_n_species, style=style)
 
             with solara.Column():
                 solara.Markdown('## Wavelength range')
@@ -108,11 +117,14 @@ def Page():
 
             wl_min, wl_max = [minimum_wavelength.value, maximum_wavelength.value] * u.um
             spectrum = get_spectrum(T_eff.value, log_g.value, cache=True)
+            meta.set(spectrum.meta)
+            # print(spectrum.meta['PHXTEFF'], spectrum.meta['PHXLOGG'])
 
             spectrum_mask = (
-                (spectrum.wavelength > wl_min) &
-                (spectrum.wavelength < wl_max)
+                (spectrum.wavelength >= wl_min) &
+                (spectrum.wavelength <= wl_max)
             )
+
             plt.plot(
                 spectrum.wavelength[spectrum_mask].to(u.um),
                 spectrum.flux[spectrum_mask],
@@ -120,7 +132,6 @@ def Page():
                 lw=spectrum_line_width.value,
                 alpha=spectrum_line_alpha.value
             )
-            loading_species.set(species_list.value)
             query_results = {}
             for i, species in enumerate(species_list.value):
                 try:
@@ -145,10 +156,6 @@ def Page():
                     if not np.isnan(alpha):
                         plt.axvline(wl, alpha=alpha, color=f'C{i}', zorder=-10)
 
-                loaded_species.set(loading_species.value + [species])
-                # new_loading_species = list(loading_species.value)
-                # new_loading_species.remove(species)
-                # loading_species.set(new_loading_species)
 
             plt.legend([Line2D([], [], color=f'C{i}') for i in range(len(species_list.value))], species_list.value)
             plt.gca().set(
@@ -172,7 +179,7 @@ def Page():
             if len(species_list.value):
                 with solara.lab.Tabs(background_color="#bbeefe", color='#000000'):
                     for species in species_list.value:
-                        with solara.lab.Tab(species):
+                        with solara.lab.Tab(species, style=style):
                             df = query_results[species].to_pandas()
                             solara.DataFrame(df.sort_values('Ritz'), items_per_page=10)
 
