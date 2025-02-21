@@ -1,3 +1,4 @@
+import os
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
@@ -11,7 +12,7 @@ from astroquery.nist import Nist
 from expecto import get_spectrum
 from expecto.core import phoenix_model_temps, phoenix_model_logg
 
-asplund_list = open('asplund_2021.txt', 'r').read().split(', ')
+asplund_list = open(os.path.join(os.path.dirname(__file__), 'asplund_2021.txt'), 'r').read().split(', ')
 fig_output = Output()
 
 
