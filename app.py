@@ -164,7 +164,7 @@ def Page():
         with solara.Column():
             solara.Markdown("## NIST Results")
             solara.Markdown(
-                'Query results from the [Atomic Spectra Database NIST Standard Reference Database 78]'
+                'Query results from the [NIST Atomic Spectra Database (Standard Reference Database 78)]'
                 '(https://www.nist.gov/pml/atomic-spectra-database) via '
                 '[astroquery.nist](https://astroquery.readthedocs.io/en/latest/nist/nist.html).'
             )
