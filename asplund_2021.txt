@@ -1,0 +1,1 @@
+H, He, O, C, Ne, N, Mg, Si, Fe, S, Al, Ar, Ca, Na, Ni, Cr, Mn, P, Cl, K, Ti, Co, Zn, F, Cu, V, Ge, Sc, Kr, Ga, Sr, B, Zr, Rb, Ba, Xe, Y, Sn, Pb, Mo, Ru, Ce, Pd, Nb, Nd, Be, Os, La, Dy, Gd, Ag, Li, Sm, Er, Tl, Au, Hf, Yb, In, W, Rh, Pr, Eu, Ho, Tb, Tm, Lu, Th
