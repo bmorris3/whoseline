@@ -33,3 +33,8 @@ launch a second one by specifying a different port:
 .. code-block:: bash
 
     whoseline --port 1234
+
+Demo video
+^^^^^^^^^^
+
+`<Follow this link to see a demo video>`_.
