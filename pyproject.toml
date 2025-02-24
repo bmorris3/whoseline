@@ -9,6 +9,9 @@ build-backend = 'setuptools.build_meta'
 [project]
 name = "whoseline"
 dynamic = ['version']
+license = "LICENSE"
+readme = "README.rst"
+description = "Whose line is it anyway? An interactive tool for identifying atomic spectral lines."
 dependencies = [
     "matplotlib",
     "solara",
@@ -22,3 +25,13 @@ dependencies = [
 
 [project.scripts]
 whoseline = "whoseline.cli:launch_app"
+
+[project.urls]
+repository = "https://github.com/bmorris3/whoseline"
+
+[tool.setuptools.packages.find]
+include = "whoseline"
+
+[tool.setuptools_scm]
+version_file = "whoseline/version.py"
+
