@@ -37,4 +37,4 @@ launch a second one by specifying a different port:
 Demo video
 ^^^^^^^^^^
 
-`<Follow this link to see a demo video>`_.
+`Follow this link to see a demo video <https://github.com/bmorris3/whoseline/wiki/Demo-video>`_.
