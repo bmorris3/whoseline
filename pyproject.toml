@@ -22,6 +22,7 @@ dependencies = [
     "astroquery",
     "expecto",
     "specutils",
+    "pandas",
 ]
 
 [project.scripts]
