@@ -10,7 +10,9 @@ import astropy.units as u
 from astroquery.nist import Nist
 
 from expecto import get_spectrum
-from expecto.core import phoenix_model_temps, phoenix_model_logg
+from expecto.core import (
+    phoenix_model_temps, phoenix_model_logg, phoenix_model_z, phoenix_model_alpha
+)
 
 import pandas as pd
 
@@ -53,6 +55,8 @@ spectrum_line_width = solara.reactive(0.7)
 meta = solara.reactive({})
 T_eff = solara.reactive(5800)
 log_g = solara.reactive(4.5)
+metallicity = solara.reactive(0.0)
+alpha = solara.reactive(0.0)
 log_scale = solara.reactive(True)
 
 style = {
@@ -89,6 +93,9 @@ def Page():
                 solara.Markdown('## PHOENIX Spectrum')
                 solara.Select("Effective temperature [K]", list(phoenix_model_temps), T_eff)
                 solara.Select("log g [cgs]", list(phoenix_model_logg), log_g)
+                solara.Select("Metallicity, Z = [M/H]", list(phoenix_model_z), metallicity)
+                solara.Select("[alpha/H]", list(phoenix_model_alpha), alpha)
+
                 if len(meta.value):
                     children = [
                         solara.HTML(tag='p', unsafe_innerHTML=str(meta.value.tostring(sep=r'<br />')))
@@ -138,7 +145,13 @@ def Page():
             fig = plt.figure(figsize=(20, 5))
 
             wl_min, wl_max = [minimum_wavelength.value, maximum_wavelength.value] * u.um
-            spectrum = get_spectrum(T_eff.value, log_g.value, cache=True)
+            spectrum = get_spectrum(
+                T_eff=T_eff.value,
+                log_g=log_g.value,
+                Z=metallicity.value,
+                alpha=alpha.value,
+                cache=True
+            )
             meta.set(spectrum.meta)
 
             spectrum_mask = (
@@ -173,9 +186,9 @@ def Page():
                 wavelength_ritz = np.array([ritz_string_to_float(ritz) for ritz in table['Ritz']])
                 S = (g_1 * f_ik * wavelength_ritz).value
                 for j, (wl, strength) in enumerate(zip(wavelength_ritz, S)):
-                    alpha = (strength - np.nanmin(S)) / np.ptp(S[~np.isnan(S)])
-                    if not np.isnan(alpha):
-                        plt.axvline(wl, alpha=alpha, color=f'C{i}', zorder=-10)
+                    plot_alpha = (strength - np.nanmin(S)) / np.ptp(S[~np.isnan(S)])
+                    if not np.isnan(plot_alpha):
+                        plt.axvline(wl, alpha=plot_alpha, color=f'C{i}', zorder=-10)
 
 
             plt.legend([Line2D([], [], color=f'C{i}') for i in range(len(species_list.value))], species_list.value)
