@@ -181,8 +181,9 @@ def Page():
                 with solara.lab.Tabs(background_color="#bbeefe", color='#000000'):
                     for species in species_list.value:
                         with solara.lab.Tab(species, style=style):
-                            df = query_results[species].to_pandas()
-                            solara.DataFrame(df.sort_values('Ritz'), items_per_page=10)
+                            if species in query_results:
+                                df = query_results[species].to_pandas()
+                                solara.DataFrame(df.sort_values('Ritz'), items_per_page=10)
 
         with solara.Column():
             pass
