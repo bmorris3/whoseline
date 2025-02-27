@@ -12,6 +12,7 @@ from astroquery.nist import Nist
 from expecto import get_spectrum
 from expecto.core import phoenix_model_temps, phoenix_model_logg
 
+
 asplund_list = open(os.path.join(os.path.dirname(__file__), 'asplund_2021.txt'), 'r').read().split(', ')
 fig_output = Output()
 
@@ -137,7 +138,7 @@ def Page():
                 try:
                     table = Nist.query(wl_min, wl_max, linename=species)
                     query_results[species] = table
-                except Exception:
+                except (Exception, KeyError):
                     # skip elements not supported in NIST query
                     continue
 
