@@ -12,8 +12,17 @@ from astroquery.nist import Nist
 from expecto import get_spectrum
 from expecto.core import phoenix_model_temps, phoenix_model_logg
 
+import pandas as pd
 
-asplund_list = open(os.path.join(os.path.dirname(__file__), 'asplund_2021.txt'), 'r').read().split(', ')
+
+df_elements = pd.read_csv(os.path.join(os.path.dirname(__file__), 'elements.csv'))
+abundance_sort = np.argsort(np.nan_to_num(df_elements['Solar Abundance'], -1))
+elements_by_abundance = list(
+    df_elements['Element'][abundance_sort[::-1]]
+)
+
+sorted_elements = solara.reactive(elements_by_abundance)
+
 fig_output = Output()
 
 
@@ -36,14 +45,12 @@ def ritz_string_to_float(s):
 
 
 n_species = solara.reactive(5)
-species_list = solara.reactive(asplund_list[:int(n_species.value)])
-
+species_list = solara.reactive(sorted_elements.value[:int(n_species.value)])
 minimum_wavelength = solara.reactive(0.38)
 maximum_wavelength = solara.reactive(0.41)
 spectrum_line_alpha = solara.reactive(1)
 spectrum_line_width = solara.reactive(0.7)
 meta = solara.reactive({})
-
 T_eff = solara.reactive(5800)
 log_g = solara.reactive(4.5)
 log_scale = solara.reactive(True)
@@ -61,17 +68,17 @@ def Page():
         species_list.set([])
 
     def select_all_species():
-        species_list.set(asplund_list)
+        species_list.set(sorted_elements)
 
     def next_n_species():
         if len(species_list.value):
-            last_idx = asplund_list.index(species_list.value[-1])
+            last_idx = sorted_elements.value.index(species_list.value[-1])
         else:
             last_idx = 0
-        species_list.set(asplund_list[last_idx:last_idx + int(n_species.value)])
+        species_list.set(sorted_elements.value[last_idx:last_idx + int(n_species.value)])
 
     def first_n_species():
-        species_list.set(asplund_list[:int(n_species.value)])
+        species_list.set(sorted_elements.value[:int(n_species.value)])
 
     with solara.Column():
         with solara.Columns([0.5, 1, 1, 1, 0.5]):
@@ -89,13 +96,27 @@ def Page():
                     solara.Details("PHOENIX model header", children=children, expand=False)
 
             with solara.Column():
-                solara.Markdown('## Elements\nSorted in order of solar abundance.')
-                solara.SelectMultiple("Elements", species_list, asplund_list)
+                solara.Markdown('## Elements')
+                solara.SelectMultiple("Elements", species_list, sorted_elements.value)
                 solara.Button("Clear selected elements", on_click=clear_species_selections, style=style)
-                solara.Button("Select all elements (slow)", on_click=select_all_species, style=style)
+
+                def order_by_atomic_number(by_atomic_number):
+                    if by_atomic_number:
+                        elements = list(
+                            df_elements['Element']
+                        )
+                    else:
+                        elements = elements_by_abundance
+
+                    sorted_elements.set(elements)
+                    species_list.set(sorted_elements.value[:int(n_species.value)])
+
+                solara.Switch(label="Order by atomic number", value=False, on_value=order_by_atomic_number)
+
                 solara.InputInt("Number of species per query", n_species)
                 solara.Button(f"Select first {n_species} elements", on_click=first_n_species, style=style)
                 solara.Button(f"Select next {n_species} elements", on_click=next_n_species, style=style)
+                solara.Button("Select all elements (slow)", on_click=select_all_species, style=style)
 
             with solara.Column():
                 solara.Markdown('## Wavelength range')
@@ -119,7 +140,6 @@ def Page():
             wl_min, wl_max = [minimum_wavelength.value, maximum_wavelength.value] * u.um
             spectrum = get_spectrum(T_eff.value, log_g.value, cache=True)
             meta.set(spectrum.meta)
-            # print(spectrum.meta['PHXTEFF'], spectrum.meta['PHXLOGG'])
 
             spectrum_mask = (
                 (spectrum.wavelength >= wl_min) &
